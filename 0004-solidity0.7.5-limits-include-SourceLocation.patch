@@ -1,0 +1,10 @@
+--- liblangutil/SourceLocation.h	2020-11-18 14:18:45.000000000 +0000
++++ liblangutil/SourceLocation.new.h	2025-03-08 22:21:51.553268912 +0000
+@@ -28,6 +28,7 @@
+ 
+ #include <liblangutil/CharStream.h>
+ 
++#include <limits>
+ #include <memory>
+ #include <string>
+ 
