@@ -177,6 +177,7 @@ _compile() {
     _cxxflags+=(
       -Wno-unused-but-set-variable
       -Wno-unqualified-std-cast-call
+      -Wno-dangling-field
     )
     _boost_version="$( \
       _boost_version_get)"
