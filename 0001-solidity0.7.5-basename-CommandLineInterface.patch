@@ -1,0 +1,12 @@
+--- CommandLineInterface.cpp	2025-03-08 19:04:01.911436780 +0100
++++ CommandLineInterface.cpp	2025-03-08 18:53:15.000000000 +0100
+@@ -764,8 +764,7 @@
+ 
+ void CommandLineInterface::createJson(string const& _fileName, string const& _json)
+ {
+-	createFile(boost::filesystem::basename(_fileName) + string(".json"), _json);
++	boost::filesystem::path _path (_fileName);
++	createFile(_filename.stem().string() + string(".json"), _json);
+ }
+ 
+ bool CommandLineInterface::parseArguments(int _argc, char** _argv)

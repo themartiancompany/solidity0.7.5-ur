@@ -1,0 +1,10 @@
+--- a/libyul/backends/wasm/WasmObjectCompiler.h	2025-03-08 18:53:15.000000000 +0100
++++ b/libyul/backends/wasm/WasmObjectCompiler.h	2025-03-08 19:14:47.681436535 +0100
+@@ -21,6 +21,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <string>
+ #include <vector>
+ #include <tuple>
