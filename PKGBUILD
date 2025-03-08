@@ -96,7 +96,7 @@ _patches=(
   "0001-${pkgname}-basename-CommandLineInterface.patch"
   "0002-${pkgname}-cstdint-include-YulString.patch"
   "0003-${pkgname}-cstdint-include-EWasmObjectCompiler.patch"
-  "0004-${pkgname}-limits-includes-SourceLocation.patch"
+  "0004-${pkgname}-limits-include-SourceLocation.patch"
   "0005-${pkgname}-fstream-include-SourceUpgrade.patch"
 )
 source=(
