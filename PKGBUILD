@@ -172,6 +172,7 @@ _compile() {
   local \
     _tests="${1}" \
     _boost_version \
+    _boost_static_libs \
     _cmake_opts=() \
     _cxxflags=()
   _cxxflags=(
@@ -184,10 +185,14 @@ _compile() {
       -Wno-unqualified-std-cast-call
       -Wno-dangling-field
     )
+    _boost_use_static_libs="OFF"
   elif [[ "${_os}" == "GNU/Linux" ]]; then
     _cxxflags+=(
       -Wno-overloaded-virtual
     )
+    _boost_use_static_libs="ON"
+  fi
+  if [[ ]]; then
   fi
   _cmake_opts=(
     # -D CMAKE_BUILD_TYPE="None"
@@ -203,6 +208,7 @@ _compile() {
     -D STRICT_Z3_VERSION="OFF"
     -D TESTS="${_tests}"
     -D USE_LD_GOLD="OFF"
+    -D Boost_USE_STATIC_LIBS="${_boost_use_static_libs}"
     -D USE_SYSTEM_LIBRARIES="OFF"
     -DCMAKE_CXX_FLAGS="${_cxxflags[*]}"
     -S "${srcdir}/${_pkg}_${pkgver}/"
