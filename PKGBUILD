@@ -179,11 +179,15 @@ _compile() {
       -Wno-unqualified-std-cast-call
       -Wno-dangling-field
       -Wno-deprecated-declarations
+    )
+  elif [[ "${_os}" == "GNU/Linux" ]]; then
+    _cxxflags+=(
       -Wno-overloaded-virtual
     )
   fi
   _cmake_opts=(
-    -D CMAKE_BUILD_TYPE="None"
+    # -D CMAKE_BUILD_TYPE="None"
+    -D CMAKE_BUILD_TYPE="Release"
     -D CMAKE_INSTALL_PREFIX="/usr/"
     -D CMAKE_EXECUTABLE_SUFFIX="${pkgver}"
     -D ONLY_BUILD_SOLIDITY_LIBRARIES="OFF"
