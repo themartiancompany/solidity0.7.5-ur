@@ -96,8 +96,8 @@ _patches=(
   "0001-${pkgname}-basename-CommandLineInterface.patch"
   "0002-${pkgname}-cstdint-include-YulString.patch"
   "0003-${pkgname}-cstdint-include-EWasmObjectCompiler.patch"
-  "0004-${pkgname}-limits-change-SourceLocation.patch"
-  "0005-${pkgname}-fstream-include-SourceLocation.patch"
+  "0004-${pkgname}-missing-includes-SourceLocation.patch"
+  "0005-${pkgname}-fstream-include-SourceUpgrade.patch"
 )
 source=(
   "${_pkg}-v${pkgver}.tar.gz::${url}/releases/download/v${pkgver}/${_pkg}_${pkgver}.tar.gz"
@@ -108,7 +108,7 @@ sha512sums=(
   'fa8e3e56a72a3fc8e912c7ebb729d3c3c5eb0a88af49009d1be33610d01d994cd4ecec20e90a5a10c45d5c3976209dcc0c6c84a5fbb80a33811550aa02847137'
   '4af0991bc6505d7e1976a478fad893da6cee097791f5c0d38bbb9cd3f6e1a4a6d44b89a75be2671723217333cb2b83442f1cf8cf018bd28667079b765e3c2d7d'
   'dd90bae065e09ba725797ac508f1a688b424ed85f491243e0998389e0158faadb863aeb94220869c8568de51f8f74a8f6515fd699d4d71dc4129ed47112a3f9c'
-  '8852408452c9df6432345973981a63ea2dbcfb7ce0e480db91bb000d6590e2577edd5d9b8374134fa85b45a383d1e14d25152a2a365c961b54ac54767f0143c3'
+  'ae87fb46aaa983423b6c6fffdd47d945138896c2aea707100819f6cfd41cfc0b4adc70d9b7c9baa6568a9c44f35011b26707b324f72193c8bf3b05506d740d45'
   'e2216d8845d29b5c29e861a479b0685c5ddbbf5b088299a215dfdfde5297f08ab340a6e70cee3c5b61f34711ff5146bbf0036a87d374c4ee0b561d53cadd2e3f'
 )
 

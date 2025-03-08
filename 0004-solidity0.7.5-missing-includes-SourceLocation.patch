@@ -1,14 +1,15 @@
 --- a/liblangutil/SourceLocation.h	2020-11-18 14:18:45.000000000 +0000
-+++ b/liblangutil/SourceLocation.h	2025-03-08 21:55:37.169028832 +0000
-@@ -28,6 +28,7 @@
++++ b/liblangutil/SourceLocation.h	2025-03-08 22:11:21.333068948 +0000
+@@ -28,6 +28,8 @@
  
  #include <liblangutil/CharStream.h>
  
++#include <algorithm>
 +#include <limits>
  #include <memory>
  #include <string>
  
-@@ -117,7 +118,7 @@
+@@ -117,7 +119,7 @@
  SourceLocation const parseSourceLocation(
  	std::string const& _input,
  	std::string const& _sourceName,
