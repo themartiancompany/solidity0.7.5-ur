@@ -179,6 +179,7 @@ _compile() {
       -Wno-unqualified-std-cast-call
       -Wno-dangling-field
       -Wno-deprecated-declarations
+      -Wno-overloaded-virtual
     )
   fi
   _cmake_opts=(
