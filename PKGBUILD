@@ -172,13 +172,13 @@ _compile() {
     _cxxflags=()
   _cxxflags=(
     "${CXXFLAGS}"
+    -Wno-deprecated-declarations
   )
   if [[ "${_os}" == "Android" ]]; then
     _cxxflags+=(
       -Wno-unused-but-set-variable
       -Wno-unqualified-std-cast-call
       -Wno-dangling-field
-      -Wno-deprecated-declarations
     )
   elif [[ "${_os}" == "GNU/Linux" ]]; then
     _cxxflags+=(
