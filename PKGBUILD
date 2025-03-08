@@ -192,8 +192,6 @@ _compile() {
     )
     _boost_use_static_libs="ON"
   fi
-  if [[ ]]; then
-  fi
   _cmake_opts=(
     # -D CMAKE_BUILD_TYPE="None"
     -D CMAKE_BUILD_TYPE="Release"
