@@ -1,0 +1,10 @@
+--- tools/solidityUpgrade/SourceUpgrade.cpp	2025-03-08 22:04:27.808875326 +0000
++++ tools/solidityUpgrade/SourceUpgrade.new.cpp	2025-03-08 22:04:05.658572115 +0000
+@@ -26,6 +26,7 @@
+ #include <boost/filesystem/operations.hpp>
+ #include <boost/algorithm/string.hpp>
+ 
++#include <fstream>
+ #ifdef _WIN32 // windows
+ 	#include <io.h>
+ 	#define isatty _isatty
