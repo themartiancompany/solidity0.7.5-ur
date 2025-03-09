@@ -32,6 +32,7 @@
 _os="$( \
   uname \
     -o)"
+_static="true"
 _pkg="solidity"
 pkgver="0.7.5"
 pkgname="${_pkg}${pkgver}"
@@ -74,8 +75,12 @@ makedepends=(
 if [[ "${_os}" == "Android" ]]; then
   makedepends+=(
     "boost-headers"
-    "boost-static"
   )
+  if [[ "" == "${_static}" ]]; then
+    makedepends+=(
+      "boost-static"
+    )
+  fi
 elif [[ "${_os}" == "GNU/Linux" ]]; then
   makedepends+=(
     "boost"
@@ -188,15 +193,17 @@ _compile() {
       -Wno-unqualified-std-cast-call
       -Wno-dangling-field
     )
-    _boost_use_static_libs="OFF"
   elif [[ "${_os}" == "GNU/Linux" ]]; then
     _cxxflags+=(
       -Wno-overloaded-virtual
     )
+  fi
+  if [[ "${_static}" == "true" ]]; then
     _boost_use_static_libs="ON"
+  elif [[ "${_static}" == "false" ]]; then
+    _boost_use_static_libs="OFF"
   fi
   _cmake_opts=(
-    # -D CMAKE_BUILD_TYPE="None"
     -D CMAKE_BUILD_TYPE="Release"
     -D CMAKE_INSTALL_PREFIX="/usr/"
     -D CMAKE_EXECUTABLE_SUFFIX="${pkgver}"
