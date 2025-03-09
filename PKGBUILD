@@ -225,11 +225,13 @@ _compile() {
   export \
     CXXFLAGS="${_cxxflags[*]}"
   CXXFLAGS="${_cxxflags[*]}" \
+  VERBOSE=1 \
   cmake \
     -B \
       "${srcdir}/${_pkg}_${pkgver}/build/" \
     "${_cmake_opts[@]}"
   CXXFLAGS="${_cxxflags[*]}" \
+  VERBOSE=1 \
   cmake \
     --build \
       "${srcdir}/${_pkg}_${pkgver}/build/"
