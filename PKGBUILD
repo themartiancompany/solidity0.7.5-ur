@@ -138,6 +138,11 @@ prepare() {
       return 1
   done
   fi
+  sed \
+    -e \
+      "/-Wsign-conversion/d" \
+    -i \
+    "cmake/EthCompilerSettings.cmake"
 }
 
 _boost_version_get() {
