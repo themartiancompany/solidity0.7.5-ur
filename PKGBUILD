@@ -179,6 +179,7 @@ _compile() {
     "${CXXFLAGS}"
     -Wno-deprecated-declarations
     -Wno-dangling-reference
+    -Wno-sign-conversion
   )
   if [[ "${_os}" == "Android" ]]; then
     _cxxflags+=(
