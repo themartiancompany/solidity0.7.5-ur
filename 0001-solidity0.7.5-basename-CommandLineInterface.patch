@@ -6,7 +6,7 @@
  {
 -	createFile(boost::filesystem::basename(_fileName) + string(".json"), _json);
 +	boost::filesystem::path _path (_fileName);
-+	createFile(_fileName.stem().string() + string(".json"), _json);
++	createFile(_path.stem().string() + string(".json"), _json);
  }
  
  bool CommandLineInterface::parseArguments(int _argc, char** _argv)
