@@ -177,6 +177,7 @@ _compile() {
     _cxxflags=()
   _cxxflags=(
     "${CXXFLAGS}"
+    -Wno-unknown-warning-option
     -Wno-deprecated-declarations
     -Wno-dangling-reference
     -Wno-sign-conversion
