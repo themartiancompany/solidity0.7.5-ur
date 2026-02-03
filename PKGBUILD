@@ -175,9 +175,9 @@ if [[ ! -v "_git" ]]; then
 fi
 if [[ ! -v "_git_service" ]]; then
   if [[ "${_boost_16}" == "true" ]]; then
-    _git_service="gitlab"
-  elif [[ "${_boost_16}" == "false" ]]; then
     _git_service="github"
+  elif [[ "${_boost_16}" == "false" ]]; then
+    _git_service="gitlab"
   fi
 fi
 if [[ ! -v "_git_http" ]]; then
@@ -196,6 +196,10 @@ if [[ ! -v "_cmake_generator" ]]; then
   _cmake_generator="make"
   # _cmake_generator="ninja"
 fi
+if [[ ! -v "_static" ]]; then
+  _static="false"
+  fi
+fi
 if [[ ! -v "_archive_format" ]]; then
   if [[ "${_git}" == "true" ]]; then
     if [[ "${_evmfs}" == "true" ]]; then
@@ -213,11 +217,11 @@ pkgbase="${_pkg}${pkgver}"
 pkgname=(
   "${pkgbase}"
 )
-_0_7_5_commit="e11b9ed9f2c254bc894d844c0a64a0eb76bbb4fd"
+_0_7_5_commit="eb77ed080a44c456caedde666e8af813685a16f4"
 _bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
 _0_7_5_1_commit="0ede754543329f3152ba0aac619a62d5c89e7da9"
 _0_7_5_2_commit="a7dc5e9a6f0aa9033479d36500c922e59bc7ab22"
-pkgrel=1
+pkgrel=2
 pkgdesc="Smart contract programming language."
 arch=(
   "x86_64"
@@ -237,8 +241,7 @@ arch=(
 # _ns="ethereum"
 # Solidity 0.7.x requires
 # a different patchset depending
-# on the Boost version it will be
-# built with.
+# on the Boost version its built with
 # With Boost lesser than 1.70
 # it requires no extra patches, with boost
 # up to 1.83 it requires version 0.7.5.1
@@ -335,7 +338,7 @@ if [[ "${_git}" == "false" ]]; then
     _tag="${_commit}"
     _tag_name="commit"
     _tarname="${_pkg}-${_tag}"
-  elif [[ "${_boost_16}" != "true" ]]; then
+  elif [[ "${_boost_16}" == "true" ]]; then
     _tag="${pkgver}"
     _tag_name="pkgver"
     _tarname="${_pkg}_${_tag}"
@@ -360,7 +363,8 @@ _github_sum="SKIP"
 _github_sig_sum="SKIP"
 _gitlab_sum="SKIP"
 _gitlab_sig_sum="SKIP"
-_github_release_sum="def2ab7c877fcd16c81a166cdc5b99bfabcee7e8d505afcce816e9b1e451c61a"
+_github_release_sum="b0b0f010ddcd7d77dc78fbc0458001476a4d0fc2d325a7a26208fb357ce5e571"
+_github_release_sig_sum="664253952ac4ba797dba1af82396cff424a95302a975dc316fee6c399d1e1bd7"
 _github_release_sha512_sum='ec095a5d8dc00187ef6df03fd14f8ce5da3f437ca55311617211ded7bd6461a680e7a42bee0819fe639cd1ef3554f9b363bcdc9cf04dddf6e136e1543a5e5f3a'
 if [[ "${_evmfs}" == "true" ]]; then
   if [[ "${_git}" == "true" ]]; then
@@ -473,39 +477,88 @@ validpgpkeys=(
   #   <dvorak@0x87003Bd6C074C713783df04f36517451fF34CBEf>
   '12D8E3D7888F741E89F86EE0FEC8567A644F1D16'
 )
-source=(
-  "${_pkg}-v${pkgver}.tar.gz::${url}/releases/download/v${pkgver}/${_pkg}_${pkgver}.tar.gz"
-  "${_patches[@]}"
-)
-sha512sums=(
-  'ec095a5d8dc00187ef6df03fd14f8ce5da3f437ca55311617211ded7bd6461a680e7a42bee0819fe639cd1ef3554f9b363bcdc9cf04dddf6e136e1543a5e5f3a'
-  '2ce1ba9454aa70b894fb46997d3c72412f306685a21349421ed3832a26bab9eef000ce926c3bb3095e8634ac740c2b828fd376d32e22ed647b996bf9b7ed5a03'
-  '4af0991bc6505d7e1976a478fad893da6cee097791f5c0d38bbb9cd3f6e1a4a6d44b89a75be2671723217333cb2b83442f1cf8cf018bd28667079b765e3c2d7d'
-  'dd90bae065e09ba725797ac508f1a688b424ed85f491243e0998389e0158faadb863aeb94220869c8568de51f8f74a8f6515fd699d4d71dc4129ed47112a3f9c'
-  '56c6034e40698afb399b19df8d7eabd92aba4f8894faa7256a81aea6f4eb1ce16379f65c9a4aec8cb47db2fb5f7ecd32b0bbcf517869d7c1ab6b9b1c54bd3b2f'
-  'e2216d8845d29b5c29e861a479b0685c5ddbbf5b088299a215dfdfde5297f08ab340a6e70cee3c5b61f34711ff5146bbf0036a87d374c4ee0b561d53cadd2e3f'
-)
+
+_git_unbundle() {
+  local \
+    _tarname="${1}" \
+    _bundle \
+    _repo \
+    _msg=()
+  _bundle="${srcdir}/${_tarname}.bundle"
+  _repo="${srcdir}/${_tarname}"
+  _msg=(
+    "Cloning '${_bundle}' into '${_repo}'."
+  )
+  msg \
+    "${_msg[*]}"
+  git \
+    clone \
+      "${_bundle}" \
+      "${_repo}" || \
+  git \
+    -C \
+      "${_repo}" \
+      pull || \
+  true
+}
+
+_git_unbundle_update() {
+  local \
+    _repo="${1}" \
+    _bundle="${2}" \
+    _repo \
+    _msg=()
+  _bundle_name="$(
+    basename \
+      "${_bundle}")"
+  _msg=(
+    "Updating '${_repo}' from '${_bundle}'."
+  )
+  msg \
+    "${_msg[*]}"
+  git \
+    -C \
+      "${_repo}" \
+      remote \
+        add \
+          "${_bundle_name}" \
+	  "${_bundle}" ||
+  true
+  git \
+    -C \
+      "${_repo}" \
+    pull \
+      "${_bundle_name}" || \
+  true
+}
 
 prepare() {
   local \
-    _patch
-  cd \
-    "${srcdir}/${_pkg}_${pkgver}"
-  _boost_version="$(
-    _boost_version_get)"
-  if _verlt \
-       "1.83.0" \
-       "${_boost_version}"; then
-    msg \
-      "Installed boost version" \
-      ">=1.83.0, applying patches"
-  for _patch in "${_patches[@]}"; do
-    patch \
-      -uNp1 \
-      -i \
-        "${srcdir}/${_patch}" || \
-      return 1
-  done
+    _commit_hash
+  if [[ "${_evmfs}" == "true" ]]; then
+    if [[ "${_git}" == "false" ]]; then
+      ur \
+        "${_like}"
+    elif [[ "${_git}" == "true" ]]; then
+      _git_unbundle \
+        "${_tarname}"
+      if [[ "${_boost_183}" == "true" ]]; then
+        _git_unbundle_update \
+          "${srcdir}/${_tarname}" \
+          "${srcdir}/${_pkg}-${_0_7_5_1_commit}"
+      elif [[ "${_boost_latest}" == "true" ]]; then
+        _git_unbundle_update \
+          "${srcdir}/${_tarname}" \
+          "${srcdir}/${_pkg}-${_0_7_5_2_commit}"
+      fi
+    fi
+  fi
+  if [[ ! -e "${srcdir}/${_tarname}/commit_hash.txt" ]]; then
+    _commit_hash="${_0_7_5_commit:0:8}"    
+    echo \
+      "${_commit_hash}" > \
+      "${srcdir}/${_tarname}/commit_hash.txt"
+  fi
   fi
   sed \
     -e \
@@ -514,14 +567,40 @@ prepare() {
     "cmake/EthCompilerSettings.cmake"
 }
 
+_bin_get() {
+  local \
+    _cc \
+    _bin
+  _cc="$(
+    command \
+      -v \
+      "cc" \
+      "g++" \
+      "clang++" | \
+      head \
+        -n \
+          1)"
+  _bin="$(
+    dirname \
+      "${_cc}")"
+  echo \
+    "${_bin}"
+}
 
 _compile() {
   local \
     _tests="${1}" \
-    _boost_version \
     _boost_static_libs \
     _cmake_opts=() \
-    _cxxflags=()
+    _cc \
+    _cxx \
+    _cxx_compiler \
+    _cxxflags=() \
+    _flags=()
+  _cc="$(
+    command \
+      -v \
+      "${_compiler}")"
   _cxxflags=(
     "${CXXFLAGS}"
     -Wno-unknown-warning-option
@@ -545,6 +624,15 @@ _compile() {
   elif [[ "${_static}" == "false" ]]; then
     _boost_use_static_libs="OFF"
   fi
+  if [[ "${_compiler}" == "gcc" ]]; then
+    _cxx_compiler="g++"
+  elif [[ "${_compiler}" == "clang" ]]; then
+   _cxx_compiler="${_compiler}++"
+  fi
+  _cxx="$(
+    command \
+      -v \
+      "${_cxx_compiler}")"
   _cmake_opts=(
     # --trace-expand 
     # -G
@@ -579,7 +667,7 @@ _compile() {
       USE_SYSTEM_LIBRARIES="OFF"
     -DCMAKE_CXX_FLAGS="${_cxxflags[*]}"
     -S
-      "${srcdir}/${_pkg}_${pkgver}/"
+      "${srcdir}/${_tarname}/"
     -Wno-dev
   )
   _flags+=(
