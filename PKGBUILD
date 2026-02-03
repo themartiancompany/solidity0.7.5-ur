@@ -198,7 +198,6 @@ if [[ ! -v "_cmake_generator" ]]; then
 fi
 if [[ ! -v "_static" ]]; then
   _static="false"
-  fi
 fi
 if [[ ! -v "_archive_format" ]]; then
   if [[ "${_git}" == "true" ]]; then
