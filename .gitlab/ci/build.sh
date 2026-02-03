@@ -371,6 +371,11 @@ _requirements() {
       true)"
   # ohoh
   if [[ "${_git_http}" == "gitlab" ]]; then
+    _msg=(
+      "Pre-downloading sources."
+    )
+    echo \
+      "${_msg[*]}"
     _commit="$(
       recipe-get \
         "/home/user/${_pkgname}/PKGBUILD" \
