@@ -174,9 +174,9 @@ if [[ ! -v "_git" ]]; then
   _git="${_evmfs}"
 fi
 if [[ ! -v "_git_service" ]]; then
-  if [[ "${_boost_oldest}" == "1.89" ]]; then
+  if [[ "${_boost_16}" == "true" ]]; then
     _git_service="gitlab"
-  elif [[ "${_boost_oldest}" != "1.89" ]]; then
+  elif [[ "${_boost_16}" == "false" ]]; then
     _git_service="github"
   fi
 fi
@@ -235,10 +235,15 @@ arch=(
 # namespace seems to have been moved
 # from 'ethereum' to 'argotorg'
 # _ns="ethereum"
-# Despite this, most Solidity versions requires
-# changes to be built with Boost versions
-# later than 1.83 which are only published
-# on The Martian Company namespaces.
+# Solidity 0.7.x requires
+# a different patchset depending
+# on the Boost version it will be
+# built with.
+# With Boost lesser than 1.70
+# it requires no extra patches, with boost
+# up to 1.83 it requires version 0.7.5.1
+# and with versions greater than 1.88
+# it requires version 0.7.5.2
 if [[ ! -v "_ns" ]]; then
   if [[ "${_boost_16}" == "true" ]]; then
     _ns="argotorg"
@@ -258,6 +263,7 @@ else
         _commit="${_0_7_5_1_commit}"
       elif [[ "${_boost_latest}" == "true" ]]; then
         _commit="${_0_7_5_2_commit}"
+      fi
     fi
   fi
 fi
@@ -355,7 +361,7 @@ _github_sig_sum="SKIP"
 _gitlab_sum="SKIP"
 _gitlab_sig_sum="SKIP"
 _github_release_sum="def2ab7c877fcd16c81a166cdc5b99bfabcee7e8d505afcce816e9b1e451c61a"
-_github_release_sha512_sum='24c3eb63b8c6ab8cae22fe26d7ce58002c34fa4e7371841833ba87363af2706826f5f86a0ef6945d7073fe52458e6f55f31b86af3469a6b039854aca36ebb869'
+_github_release_sha512_sum='ec095a5d8dc00187ef6df03fd14f8ce5da3f437ca55311617211ded7bd6461a680e7a42bee0819fe639cd1ef3554f9b363bcdc9cf04dddf6e136e1543a5e5f3a'
 if [[ "${_evmfs}" == "true" ]]; then
   if [[ "${_git}" == "true" ]]; then
     _sum="${_bundle_sum}"
@@ -393,10 +399,10 @@ _evmfs_uri="${_evmfs_dir}/${_bundle_sum}"
 _evmfs_src="${_tarfile}::${_evmfs_uri}"
 _sig_uri="${_evmfs_dir}/${_bundle_sig_sum}"
 _sig_src="${_tarfile}.sig::${_sig_uri}"
-_0_8_24_1_uri="${_evmfs_dir}/${_0_8_24_1_sum}"
-_0_8_24_1_src="${_0_8_24_1_tarfile}::${_0_8_24_1_uri}"
-_0_8_24_1_sig_uri="${_evmfs_dir}/${_0_8_24_1_sig_sum}"
-_0_8_24_1_sig_src="${_0_8_24_1_tarfile}.sig::${_0_8_24_1_sig_uri}"
+_0_7_5_2_uri="${_evmfs_dir}/${_0_7_5_2_sum}"
+_0_7_5_2_src="${_0_7_5_2_tarfile}::${_0_7_5_2_uri}"
+_0_7_5_2_sig_uri="${_evmfs_dir}/${_0_7_5_2_sig_sum}"
+_0_7_5_2_sig_src="${_0_7_5_2_tarfile}.sig::${_0_7_5_2_sig_uri}"
 if [[ "${_evmfs}" == "true" ]]; then
   if [[ "${_git}" == "false" ]]; then
     makedepends+=(
@@ -414,14 +420,14 @@ if [[ "${_evmfs}" == "true" ]]; then
     sha256sums+=(
       "${_bundle_sig_sum}"
     )
-    if [[ "${_boost_oldest}" == "1.89" ]]; then
+    if [[ "${_boost_16}" == "false" ]]; then
       source+=(
-        "${_0_8_24_1_src}"
-        "${_0_8_24_1_sig_src}"
+        "${_0_7_5_2_src}"
+        "${_0_7_5_2_sig_src}"
       )
       sha256sums+=(
-        "${_0_8_24_1_sum}"
-        "${_0_8_24_1_sig_sum}"
+        "${_0_7_5_2_sum}"
+        "${_0_7_5_2_sig_sum}"
       )
     fi
   fi
