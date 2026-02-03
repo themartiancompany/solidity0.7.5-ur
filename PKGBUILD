@@ -558,7 +558,6 @@ prepare() {
       "${_commit_hash}" > \
       "${srcdir}/${_tarname}/commit_hash.txt"
   fi
-  fi
   sed \
     -e \
       "/-Wsign-conversion/d" \
