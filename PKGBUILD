@@ -51,14 +51,18 @@ if [[ ! -v "_evmfs" ]]; then
     _evmfs="false"
   fi
 fi
-_locale="$(
-  locale |
-    grep \
-      "LANG=" |
-      awk \
-        -F \
-          "=" \
-        '{print $1}')"
+if [[ "${_os}" == "Android" ]]; then
+  _locale="C.UTF-8"
+else
+  _locale="$(
+    locale |
+      grep \
+        "LANG=" |
+        awk \
+          -F \
+            "=" \
+          '{print $1}')"
+fi
 if [[ ! -v "_en" ]]; then
   _en="true"
   if [[ "${_locale}" == "C.UTF-8" ]]; then
@@ -220,7 +224,7 @@ _0_7_5_commit="eb77ed080a44c456caedde666e8af813685a16f4"
 _bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
 _0_7_5_1_commit="0ede754543329f3152ba0aac619a62d5c89e7da9"
 _0_7_5_2_commit="2bb72518572cb60ca8d022a67ba9e8355ac1cc67"
-pkgrel=10
+pkgrel=11
 pkgdesc="Smart contract programming language."
 arch=(
   "x86_64"
