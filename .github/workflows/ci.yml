@@ -618,13 +618,13 @@ jobs:
       - name:
           Installs package build dependencies.
         run: |
-          makedepends=( $(
+          export \
+            _makedepends=( $( \
             /entrypoint.sh \
               _evmfs="false" \
               recipe-get \
                 "PKGBUILD" \
-                "makedepends")
-          )
+                "makedepends") )
           pacman \
             -S \
             --noconfirm \
