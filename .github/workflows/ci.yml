@@ -618,17 +618,14 @@ jobs:
       - name:
           Installs package build dependencies.
         run: |
-          export \
-            _makedepends=( $( \
-            /entrypoint.sh \
-              _evmfs="false" \
-              recipe-get \
-                "PKGBUILD" \
-                "makedepends") )
           pacman \
             -S \
             --noconfirm \
-            "${_makedepends[@]}"
+            $(/entrypoint.sh \
+                _evmfs="false" \
+                recipe-get \
+                  "PKGBUILD" \
+                  "makedepends")
       - name:
           Builds the package.
         run: |
@@ -1366,6 +1363,16 @@ jobs:
           git \
             clone \
               "https://github.com/themartiancompany/reallymakepkg"
+      - name:
+          Installs package build dependencies.
+        run: |
+          pacman \
+            -S \
+            $(bash \
+                _evmfs="false" \
+                "reallymakepkg/reallymakepkg/recipe-get" \
+                  "PKGBUILD" \
+                  "makedepends")
       - name:
           Builds the package.
         run: |
