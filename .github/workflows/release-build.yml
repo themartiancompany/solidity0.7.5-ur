@@ -592,13 +592,26 @@ jobs:
                 -y \
                 "clang" \
                 "ninja"
-          # This doesn't work
+          # This doesn't work because 'NO KEYSERVERS AVAILABLE'
+          # /entrypoint.sh \
+          #   gpg \
+          #     --homedir \
+          #       "/data/data/com.termux/files/usr/etc/pacman.d/gnupg" \
+          #     --recv-keys \
+          #       "998DE27318E867EA976BA877389CEED64573DFCA"
+          # So you know what?
+          /entrypoint.sh \
+            evmfs \
+              -o \
+                "pacman@termux.dev.asc" \
+              get \
+                "evmfs://100/0x69470b18f8b8b5f92b48f6199dcb147b4be96571/0x87003Bd6C074C713783df04f36517451fF34CBEf/40058fc10eb613e40f3447707ee0a972b956927b5b34250241c76e1ed62a233c"  
           /entrypoint.sh \
             gpg \
               --homedir \
                 "/data/data/com.termux/files/usr/etc/pacman.d/gnupg" \
-              --recv-keys \
-                "998DE27318E867EA976BA877389CEED64573DFCA"
+              import \
+                "pacman@termux.dev.asc"
           # One needs to manually install the
           # termux-keyring pacman package if
           # in the Termux Debian environment.
