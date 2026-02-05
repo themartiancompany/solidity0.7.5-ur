@@ -621,7 +621,7 @@ jobs:
               _evmfs="false" \
               recipe-get \
                 "PKGBUILD" \
-                "makedepends")"
+                "makedepends")
           )
           pacman \
             -S \
