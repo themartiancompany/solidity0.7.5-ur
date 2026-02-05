@@ -620,6 +620,7 @@ jobs:
         run: |
           /entrypoint.sh \
             TERMUX_VERSION="50" \
+            _git_service="github" \
             _evmfs="false" \
             reallymakepkg \
               -v \
@@ -1205,7 +1206,7 @@ jobs:
         run: |
           su \
             -c \
-              "cd '$(pwd)' && _evmfs="false" makepkg -df --nocheck" - \
+              "cd '$(pwd)' && _evmfs="false" _git_service="github" makepkg -df --nocheck" - \
             "user"
       - name:
           Installs the package.

@@ -617,6 +617,7 @@ jobs:
           Builds the package.
         run: |
           /entrypoint.sh \
+            _git_service="github" \
             _evmfs="false" \
             _git="true" \
             TERMUX_VERSION=50 \
@@ -1189,7 +1190,7 @@ jobs:
         run: |
           su \
             -c \
-              "cd $(pwd) && _evmfs="false" reallymakepkg -v -u -w '/home/user/fur-git-build' -- -df --nocheck" - \
+              "cd $(pwd) && _evmfs="false" _git_service="github" reallymakepkg -v -u -w '/home/user/fur-git-build' -- -df --nocheck" - \
             "user"
       - name:
           Installs the package.
@@ -1386,6 +1387,7 @@ jobs:
           #   -df \
           #   --nocheck
           _evmfs="false" \
+          _git_service="github" \
           reallymakepkg \
             -v \
             -w \
