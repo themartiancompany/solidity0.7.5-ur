@@ -129,7 +129,7 @@ jobs:
           chown \
             -R \
             "1000:1000" \
-            "$(pwd)"
+            "${PWD}"
       - name:
           Setup user's home.
         run: |
@@ -623,10 +623,11 @@ jobs:
               recipe-get \
                 "PKGBUILD" \
                 "makedepends") )
-          pacman \
-            -S \
-            --noconfirm \
-            "${_makedepends[@]}"
+          /entrypoint.sh \
+            pacman \
+              -S \
+              --noconfirm \
+              "${_makedepends[@]}"
       - name:
           Builds the package.
         run: |
@@ -647,7 +648,7 @@ jobs:
             echo \
               "Home: ${HOME}"
           find \
-            "$(pwd)" \
+            "${PWD}" \
             -iname \
               "*.pkg.tar.*"
       - name:
@@ -670,7 +671,7 @@ jobs:
               -Udd \
               --noconfirm \
               $(find \
-                  "$(pwd)" \
+                  "${PWD}" \
                   -iname \
                     "*.pkg.tar.*")
       - name:
@@ -803,10 +804,10 @@ jobs:
             "%s\n" \
             "ID: '$(id)'." \
             "Home: '${HOME}'." \
-            "Current directory: '$(pwd)'." \
-            "Contents of the directory '$(pwd)':"
+            "Current directory: '${PWD}'." \
+            "Contents of the directory '${PWD}':"
           ls \
-            "$(pwd)"
+            "${PWD}"
           tree \
             -L \
               2 \
@@ -1183,7 +1184,7 @@ jobs:
           chown \
             -R \
             "user:user" \
-            "$(pwd)"
+            "${PWD}"
       - name:
           Installs build dependencies.
         run: |
@@ -1204,7 +1205,7 @@ jobs:
         run: |
           su \
             -c \
-              "cd $(pwd) && _evmfs="false" _git_service="github" reallymakepkg -v -u -w '/home/user/fur-git-build' -- -df --nocheck" - \
+              "cd ${PWD} && _evmfs="false" _git_service="github" reallymakepkg -v -u -w '/home/user/fur-git-build' -- -df --nocheck" - \
             "user"
       - name:
           Installs the package.
@@ -1223,7 +1224,7 @@ jobs:
             -Udd \
             --noconfirm \
             $(find \
-                "$(pwd)" \
+                "${PWD}" \
                 -iname \
                   "*.pkg.tar.*")
       - name:
@@ -1388,8 +1389,21 @@ jobs:
               --global \
                 "core.autocrlf" \
                 "false"
+      - name:
+          Installs package build dependencies.
+        run: |
       - uses:
           actions/checkout@v3
+          export \
+            _makedepends=( $( \
+              _evmfs="false" \
+              recipe-get \
+                "PKGBUILD" \
+                "makedepends") )
+          pacman \
+            -S \
+            --noconfirm \
+            "${_makedepends[@]}"
       - name:
           Builds the Windows package.
         run: |
@@ -1411,7 +1425,7 @@ jobs:
             -df \
             --nocheck
           find \
-            "$(pwd)" \
+            "${PWD}" \
             -iname \
               "*.pkg.tar.*"
       - name:
@@ -1434,7 +1448,7 @@ jobs:
             --noconfirm \
             --overwrite="*" \
             $(find \
-                "$(pwd)" \
+                "${PWD}" \
                 -iname \
                   "*.pkg.tar.*")
       - name:
