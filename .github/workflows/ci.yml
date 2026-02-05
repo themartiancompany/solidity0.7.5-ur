@@ -625,7 +625,8 @@ jobs:
           #       "998DE27318E867EA976BA877389CEED64573DFCA"
           # So you know what?
           /entrypoint.sh \
-            evmfs \
+            PATH="${PATH}:/data/data/com.termux/files/usr/bin" \
+            evmfs-get \
               -o \
                 "pacman@termux.dev.asc" \
               get \
