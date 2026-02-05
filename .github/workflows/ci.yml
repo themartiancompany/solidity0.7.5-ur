@@ -618,6 +618,7 @@ jobs:
       - name:
           Installs package build dependencies.
         run: |
+          /entrypoint.sh \
           pacman \
             -S \
             --noconfirm \
@@ -1368,8 +1369,8 @@ jobs:
         run: |
           pacman \
             -S \
-            $(bash \
-                _evmfs="false" \
+            $(_evmfs="false" \
+              bash \
                 "reallymakepkg/reallymakepkg/recipe-get" \
                   "PKGBUILD" \
                   "makedepends")
