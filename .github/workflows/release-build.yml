@@ -614,7 +614,7 @@ jobs:
           #     install \
           #     "meson"
       - name:
-          Install package build dependencies.
+          Installs package build dependencies.
         run: |
           makedepends=( $(
             /entrypoint.sh \
