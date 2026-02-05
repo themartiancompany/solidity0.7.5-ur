@@ -614,6 +614,20 @@ jobs:
           #     install \
           #     "meson"
       - name:
+          Install package build dependencies.
+        run: |
+          makedepends=( $(
+            /entrypoint.sh \
+              _evmfs="false" \
+              recipe-get \
+                "PKGBUILD" \
+                "makedepends")"
+          )
+          pacman \
+            -S \
+            --noconfirm \
+            "${_makedepends[@]}"
+      - name:
           Builds the package.
         run: |
           /entrypoint.sh \
