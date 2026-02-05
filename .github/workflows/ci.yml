@@ -620,7 +620,7 @@ jobs:
         run: |
           /entrypoint.sh \
           pacman \
-            -S \
+            -Sy \
             --noconfirm \
             $(/entrypoint.sh \
                 _evmfs="false" \
@@ -1199,7 +1199,7 @@ jobs:
       #         "git clone 'https://github.com/themartiancompany/sequoia-sq-ur' "$(pwd)/sequoia-sq'" - \
       #       user
       - name:
-          Installs build dependencies.
+          Installs package build dependencies.
         run: |
           export \
             _pkgs=(
@@ -1359,6 +1359,84 @@ jobs:
       - uses:
           actions/checkout@v3
       - name:
+          Installs Crash Bash Library.
+        run: |
+          git \
+            clone \
+              --branch="libcrash-bash" \
+              --single-branch \
+              --depth=1 \
+              "https://github.com/themartiancompany/fur" \
+              "${HOME}/fur"
+          rm \
+            "${HOME}/fur/arch/any/"*".pkg.tar."*".sig"
+          pacman \
+            -Udd \
+            --noconfirm \
+            "${HOME}/fur/arch/any/"*".pkg.tar."*
+          rm \
+            -rf \
+            "${HOME}/fur"
+      - name:
+          Installs Fur.
+        run: |
+          git \
+            clone \
+              --branch="fur" \
+              --single-branch \
+              --depth=1 \
+              "https://github.com/themartiancompany/fur" \
+              "${HOME}/fur"
+          rm \
+            "${HOME}/fur/arch/any/"*".pkg.tar."*".sig"
+          pacman \
+            -Udd \
+            --noconfirm \
+            "${HOME}/fur/arch/any/"*".pkg.tar."*
+          rm \
+            -rf \
+            "${HOME}/fur"
+      - name:
+          Installs Inteppacman.
+        run: |
+          pacman \
+            -S \
+            --noconfirm \
+            "tree"
+          fur \
+            -v \
+            -p \
+              "pacman" \
+            -d \
+            "inteppacman"
+          rm \
+            "${HOME}/fur/arch/any/"*".pkg.tar."*".sig"
+          tree \
+            "${HOME}"
+          pacman \
+            -Udd \
+            --noconfirm \
+            "${HOME}/fur/arch/any/"*".pkg.tar."*
+          rm \
+            -rf \
+            "${HOME}/fur"
+      - name:
+          Installs Reallymakepkg.
+        run: |
+          fur \
+            -v \
+            -d \
+            "reallymakepkg"
+          rm \
+            "${HOME}/fur/arch/any/"*".pkg.tar."*".sig"
+          pacman \
+            -Udd \
+            --noconfirm \
+            "${HOME}/fur/arch/any/"*".pkg.tar."*
+          rm \
+            -rf \
+            "${HOME}/fur"
+      - name:
           Gets recipe-get.
         run: |
           git \
@@ -1401,9 +1479,16 @@ jobs:
       - name:
           Tests the package.
         run: |
-          fur \
-            -v \
-            evm-chains
+          git \
+            clone \
+              "https://github.com/themartiancompany/evmfs"
+          solc0.7.5 \
+            --evm-version \
+              "istanbul" \
+            --bin \
+             -o \
+               "bytecode" \
+            "evmfs/contracts/FileSystem/1.0/FileSystem.sol"
       - name:
           version
         run: |
