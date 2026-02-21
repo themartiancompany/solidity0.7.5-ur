@@ -215,7 +215,7 @@ if [[ ! -v "_archive_format" ]]; then
   fi
 fi
 _pkg=solidity
-pkgver="0.7.5"
+pkgver=0.7.5
 pkgbase="${_pkg}${pkgver}"
 pkgname=(
   "${pkgbase}"
