@@ -1,22 +1,23 @@
 [comment]: <> (SPDX-License-Identifier: AGPL-3.0)
 
-[comment]: <> (-------------------------------------------------------------)
+[comment]: <> (-------------------------------------------------------)
 [comment]: <> (Copyright © 2024, 2025, 2026  Pellegrino Prevete)
 [comment]: <> (All rights reserved)
-[comment]: <> (-------------------------------------------------------------)
+[comment]: <> (-------------------------------------------------------)
 
 [comment]: <> (This program is free software: you can redistribute)
 [comment]: <> (it and/or modify it under the terms of the GNU Affero)
 [comment]: <> (General Public License as published by the Free)
 [comment]: <> (Software Foundation, either version 3 of the License.)
 
-[comment]: <> (This program is distributed in the hope that it will be useful,)
-[comment]: <> (but WITHOUT ANY WARRANTY; without even the implied warranty of)
-[comment]: <> (MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the)
-[comment]: <> (GNU Affero General Public License for more details.)
+[comment]: <> (This program is distributed in the hope that it will be)
+[comment]: <> (useful, but WITHOUT ANY WARRANTY; without even the)
+[comment]: <> (implied warranty of MERCHANTABILITY or FITNESS FOR A)
+[comment]: <> (PARTICULAR PURPOSE.)
 
-[comment]: <> (You should have received a copy of the GNU Affero General Public)
-[comment]: <> (License along with this program.)
+[comment]: <> (See the GNU Affero General Public License for more)
+[comment]: <> (details. You should have received a copy of the GNU)
+[comment]: <> (Affero License along with this program.)
 [comment]: <> (If not, see <https://www.gnu.org/licenses/>.)
 
 # `solidity0.7.5`
