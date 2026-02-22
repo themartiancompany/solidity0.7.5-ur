@@ -7,17 +7,18 @@
 #    ----------------------------------------------------------------------
 #
 #    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU Affero General Public License for more details.
 #
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#    You should have received a copy of the GNU Affero General Public
+#    License along with this program.
+#    If not, see <https://www.gnu.org/licenses/>.
 
 # Maintainers:
 #   Truocolo
@@ -297,9 +298,17 @@ depends=(
   "nlohmann-json"
   "range-v3"
 )
+_cvc4_optdepends=(
+  "cvc4:"
+    "SMT checker"
+)
+_z3_optdepends=(
+  "z3:"
+    "SMT checker"
+)
 optdepends=(
-  "cvc4: SMT checker"
-  "z3: SMT checker"
+  "${_cvc4_optdepends[*]}"
+  "${_z3_optdepends[*]}"
 )
 makedepends=(
   "${_boost_makedepends[@]}"
