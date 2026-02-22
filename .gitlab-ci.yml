@@ -184,7 +184,6 @@ release:
     when: on_failure
     paths:
       - build-directory.tar.xz
-
   stage: build
   extends: .release
   parallel:
