@@ -218,7 +218,11 @@ if [[ ! -v "_archive_format" ]]; then
       _archive_format="git"
     fi
   elif [[ "${_git}" == "false" ]]; then
-    _archive_format="tar.gz"
+    if [[ "${_git_service}" == "github" ]]; then
+      _archive_format="zip"
+    elif [[ "${_git_service}" == "gitlab" ]]; then
+      _archive_format="tar.gz"
+    fi
   fi
 fi
 _pkg=solidity
@@ -231,18 +235,19 @@ _0_7_5_commit="eb77ed080a44c456caedde666e8af813685a16f4"
 _bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
 _0_7_5_1_commit="0ede754543329f3152ba0aac619a62d5c89e7da9"
 _0_7_5_2_commit="2bb72518572cb60ca8d022a67ba9e8355ac1cc67"
-pkgrel=21
+pkgrel=22
 pkgdesc="Smart contract programming language."
 arch=(
-  "x86_64"
-  "i686"
   "aarch64"
   "arm"
+  "armv8l"
   "armv7l"
   "armv6l"
+  "i686"
   "mips"
   "powerpc"
   "pentium4"
+  "x86_64"
 )
 # In late 2025 or 2026, according
 # to Github, Solidity publishing
@@ -378,8 +383,8 @@ _0_7_5_1_sum="SKIP"
 _0_7_5_1_sig_sum="SKIP"
 _0_7_5_2_sum="10de91f9b200fb0273607c6059764bfcc83aa35587dc44e35c2e4aa2db5a8668"
 _0_7_5_2_sig_sum="9c31d573cb39fe74c8017350088d77836718a5e7b053ed1295e12ede4fbb1093"
-_github_sum="SKIP"
-_github_sig_sum="SKIP"
+_github_sum="dd9f84f2240928a98cee6d0aca8fb429d04b645c9983fd5437a70ed52157aa53"
+_github_sig_sum="15ce7692ac69a04617736f60b423bfeab5a86e715f31f25b25e61325d239e58b"
 _gitlab_sum="SKIP"
 _gitlab_sig_sum="SKIP"
 _github_release_sum="b0b0f010ddcd7d77dc78fbc0458001476a4d0fc2d325a7a26208fb357ce5e571"
