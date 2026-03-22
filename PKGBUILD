@@ -235,7 +235,7 @@ _0_7_5_commit="eb77ed080a44c456caedde666e8af813685a16f4"
 _bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
 _0_7_5_1_commit="0ede754543329f3152ba0aac619a62d5c89e7da9"
 _0_7_5_2_commit="2bb72518572cb60ca8d022a67ba9e8355ac1cc67"
-pkgrel=22
+pkgrel=23
 pkgdesc="Smart contract programming language."
 arch=(
   "aarch64"
@@ -301,6 +301,10 @@ if [[ "${_os}" == "Android" ]]; then
     "boost-static"
   )
 elif [[ "${_os}" == "GNU/Linux" ]]; then
+  _boost_pkgname="boost-libs"
+elif [[ "${_os}" == "Msys" ]]; then
+  _boost_pkgname="boost-libs"
+else
   _boost_pkgname="boost-libs"
 fi
 depends=(
@@ -636,6 +640,7 @@ _compile() {
       -Wno-unused-but-set-variable
       -Wno-unqualified-std-cast-call
       -Wno-dangling-field
+      -Wno-deprecated-literal-operator
     )
   elif [[ "${_os}" == "GNU/Linux" ]]; then
     _cxxflags+=(
