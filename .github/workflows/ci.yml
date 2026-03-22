@@ -6,7 +6,7 @@
 #    ----------------------------------------------------------------------
 #    Copyright © 2024, 2025 Guilherme Janczak,
 #                           Robert Kirkman,
-#                2025, 2026 Pellegrino Prevete
+#                           Pellegrino Prevete
 #
 #    All rights reserved
 #    ----------------------------------------------------------------------
@@ -26,13 +26,13 @@
 
 
 # empty name
-name:
-  ci
-run-name:
-  Builds Life and DogeOS packages (CI).
-on:
-  [push,
-   pull_request]
+# name:
+#   ci
+# run-name:
+#   Builds Life and DogeOS packages (CI).
+# on:
+#   [push,
+#    pull_request]
 
 jobs:
   # This is what is currently necessary to make termux-docker work with GHA.
@@ -364,28 +364,6 @@ jobs:
               -rf \
               "${HOME}/fur"
       - name:
-          Installs Key Gen.
-        run: |
-          /entrypoint.sh \
-            fur \
-              -v \
-              -p \
-                "pacman" \
-              -d \
-              "key-gen"
-          /entrypoint.sh \
-            rm \
-              "${HOME}/fur/termux/any/"*".pkg.tar."*".sig"
-          /entrypoint.sh \
-            pacman \
-              -Udd \
-              --noconfirm \
-              "${HOME}/fur/termux/any/"*".pkg.tar."*
-          /entrypoint.sh \
-            rm \
-              -rf \
-              "${HOME}/fur"
-      - name:
           Installs EVM Chains Info.
         run: |
           /entrypoint.sh \
@@ -616,66 +594,32 @@ jobs:
                 -y \
                 "clang" \
                 "ninja"
-          # This doesn't work because 'NO KEYSERVERS AVAILABLE'
+          # This doesn't work
           # /entrypoint.sh \
           #   gpg \
           #     --homedir \
           #       "/data/data/com.termux/files/usr/etc/pacman.d/gnupg" \
           #     --recv-keys \
           #       "998DE27318E867EA976BA877389CEED64573DFCA"
-          # So you know what?
-          /entrypoint.sh \
-            pacman \
-              -Ql \
-              "evm-wallet"
-          /entrypoint.sh \
-            evm-wallet
-          /entrypoint.sh \
-            PATH="${PATH}:/data/data/com.termux/files/usr/bin" \
-            evmfs-get \
-              -o \
-                "pacman@termux.dev.asc" \
-              get \
-                "evmfs://100/0x69470b18f8b8b5f92b48f6199dcb147b4be96571/0x87003Bd6C074C713783df04f36517451fF34CBEf/40058fc10eb613e40f3447707ee0a972b956927b5b34250241c76e1ed62a233c"  
-          /entrypoint.sh \
-            gpg \
-              --homedir \
-                "/data/data/com.termux/files/usr/etc/pacman.d/gnupg" \
-              import \
-                "pacman@termux.dev.asc"
-
           # One needs to manually install the
           # termux-keyring pacman package if
           # in the Termux Debian environment.
-          /entrypoint.sh \
-            pacman \
-              -Sy \
-              termux-keyring
-          /entrypoint.sh \
-            pacman-key \
-              --init
+          # /entrypoint.sh \
+          #   pacman \
+          #     -Sy \
+          #     termux-keyring
+          # /entrypoint.sh \
+          #   pacman-key \
+          #     --init
           # /entrypoint.sh \
           #   pip \
           #     install \
           #     "meson"
       - name:
-          Installs package build dependencies.
-        run: |
-          /entrypoint.sh \
-          pacman \
-            -Sy \
-            --noconfirm \
-            $(/entrypoint.sh \
-                _evmfs="false" \
-                recipe-get \
-                  "PKGBUILD" \
-                  "makedepends")
-      - name:
           Builds the package.
         run: |
           /entrypoint.sh \
             TERMUX_VERSION="50" \
-            _git_service="github" \
             _evmfs="false" \
             reallymakepkg \
               -v \
@@ -1242,7 +1186,7 @@ jobs:
       #         "git clone 'https://github.com/themartiancompany/sequoia-sq-ur' "$(pwd)/sequoia-sq'" - \
       #       user
       - name:
-          Installs package build dependencies.
+          Installs build dependencies.
         run: |
           export \
             _pkgs=(
@@ -1261,7 +1205,7 @@ jobs:
         run: |
           su \
             -c \
-              "cd '$(pwd)' && _evmfs="false" _git_service="github" makepkg -df --nocheck" - \
+              "cd '$(pwd)' && _evmfs="false" makepkg -df --nocheck" - \
             "user"
       - name:
           Installs the package.
@@ -1402,99 +1346,11 @@ jobs:
       - uses:
           actions/checkout@v3
       - name:
-          Installs Crash Bash Library.
-        run: |
-          git \
-            clone \
-              --branch="libcrash-bash" \
-              --single-branch \
-              --depth=1 \
-              "https://github.com/themartiancompany/fur" \
-              "${HOME}/fur"
-          rm \
-            "${HOME}/fur/arch/any/"*".pkg.tar."*".sig"
-          pacman \
-            -Udd \
-            --noconfirm \
-            "${HOME}/fur/arch/any/"*".pkg.tar."*
-          rm \
-            -rf \
-            "${HOME}/fur"
-      - name:
-          Installs Fur.
-        run: |
-          git \
-            clone \
-              --branch="fur" \
-              --single-branch \
-              --depth=1 \
-              "https://github.com/themartiancompany/fur" \
-              "${HOME}/fur"
-          rm \
-            "${HOME}/fur/arch/any/"*".pkg.tar."*".sig"
-          pacman \
-            -Udd \
-            --noconfirm \
-            "${HOME}/fur/arch/any/"*".pkg.tar."*
-          rm \
-            -rf \
-            "${HOME}/fur"
-      - name:
-          Installs Inteppacman.
-        run: |
-          pacman \
-            -S \
-            --noconfirm \
-            "tree"
-          fur \
-            -v \
-            -p \
-              "pacman" \
-            -d \
-            "inteppacman"
-          rm \
-            "${HOME}/fur/arch/any/"*".pkg.tar."*".sig"
-          tree \
-            "${HOME}"
-          pacman \
-            -Udd \
-            --noconfirm \
-            "${HOME}/fur/arch/any/"*".pkg.tar."*
-          rm \
-            -rf \
-            "${HOME}/fur"
-      - name:
-          Installs Reallymakepkg.
-        run: |
-          fur \
-            -v \
-            -d \
-            "reallymakepkg"
-          rm \
-            "${HOME}/fur/arch/any/"*".pkg.tar."*".sig"
-          pacman \
-            -Udd \
-            --noconfirm \
-            "${HOME}/fur/arch/any/"*".pkg.tar."*
-          rm \
-            -rf \
-            "${HOME}/fur"
-      - name:
           Gets recipe-get.
         run: |
           git \
             clone \
               "https://github.com/themartiancompany/reallymakepkg"
-      - name:
-          Installs package build dependencies.
-        run: |
-          pacman \
-            -S \
-            $(_evmfs="false" \
-              bash \
-                "reallymakepkg/reallymakepkg/recipe-get" \
-                  "PKGBUILD" \
-                  "makedepends")
       - name:
           Builds the package.
         run: |
@@ -1522,16 +1378,9 @@ jobs:
       - name:
           Tests the package.
         run: |
-          git \
-            clone \
-              "https://github.com/themartiancompany/evmfs"
-          solc0.7.5 \
-            --evm-version \
-              "istanbul" \
-            --bin \
-             -o \
-               "bytecode" \
-            "evmfs/contracts/FileSystem/1.0/FileSystem.sol"
+          fur \
+            -v \
+            evm-chains
       - name:
           version
         run: |

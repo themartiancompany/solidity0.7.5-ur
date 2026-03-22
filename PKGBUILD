@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0
 
 #    ---------------------------------------------------------------
-#    Copyright © 2022024, 2025, 2026
+#    Copyright © 2022, 2023, 2024, 2025, 2026
 #              Pellegrino Prevete
 #
 #    All rights reserved
@@ -198,6 +198,10 @@ if [[ "${_os}" == "Android" ]]; then
   _compiler="clang"
 elif [[ "${_os}" == "GNU/Linux" ]]; then
   _compiler="gcc"
+elif [[ "${_os}" == "MSys" ]]; then
+  _compiler="gcc"
+else
+  _compiler="gcc"
 fi
 if [[ ! -v "_cmake_generator" ]]; then
   _cmake_generator="make"
@@ -227,7 +231,7 @@ _0_7_5_commit="eb77ed080a44c456caedde666e8af813685a16f4"
 _bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
 _0_7_5_1_commit="0ede754543329f3152ba0aac619a62d5c89e7da9"
 _0_7_5_2_commit="2bb72518572cb60ca8d022a67ba9e8355ac1cc67"
-pkgrel=20
+pkgrel=21
 pkgdesc="Smart contract programming language."
 arch=(
   "x86_64"

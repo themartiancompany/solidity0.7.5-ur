@@ -4,9 +4,10 @@
 #    release.yaml
 #
 #    ----------------------------------------------------------------------
-#    Copyright © 2024, 2025 Guilherme Janczak,
+#    Copyright © 2024, 2025
+#                2026       Guilherme Janczak,
 #                           Robert Kirkman,
-#                2025, 2026 Pellegrino Prevete
+#                           Pellegrino Prevete
 #
 #    All rights reserved
 #    ----------------------------------------------------------------------
@@ -47,8 +48,36 @@ jobs:
         include:
           - runner:
               ubuntu-24.04-arm
+            platform:
+              android
+            platform_target:
+              termux
             architecture:
               aarch64
+          - runner:
+              ubuntu-24.04
+            platform:
+              android
+            platform_target:
+              termux
+            architecture:
+              i686
+          - runner:
+              ubuntu-24.04-arm
+            platform:
+              android
+            platform_target:
+              termux
+            architecture:
+              arm
+          - runner:
+              ubuntu-24.04
+            platform:
+              android
+            platform_target:
+              termux
+            architecture:
+              x86_64
     runs-on:
       ${{ matrix.runner }}
     # prepare writable volume prefix mount for actions/upload-artifact,
@@ -61,6 +90,8 @@ jobs:
         - /tmp/node20:/__e/node20
     # approximate environment variables for actions that can't be forced to use entrypoint.sh
     env:
+      GH_TOKEN:
+        ${{ github.token }}
       TERMUX_MAIN_PACKAGE_FORMAT:
         debian
       TERMUX_VERSION:
@@ -146,41 +177,70 @@ jobs:
               install \
                 -y \
                 "python"
-      - name:
-          Installs Rust.
-        run: |
-          # env 
-          #   _arch="$( \
-          #     uname \
-          #       -m)" \
-          #   export \
-          #     _arch="$( \
-          #       uname \
-          #         -m)" && \
-          #   /entrypoint.sh \
-          #     echo \
-          #       "Architecture: ${_arch}" && \
-          #     if [[ "$(uname -m)" == "armv7l" || \
-          #           "$(uname -m)" == "armv8l" ]]; then \
-          #       _rust="rust-std-armv7-linux-androideabi" \
-          #     fi \
-          #     if [[ "${RUNNER_ARCH}" == "X64" ]]; then \
-          #       _rust="rust" && \
-          #       export \
-          #         _rust="${_rust}" \
-          #     fi \
-          #     if [[ "$(uname -m)" == "i686" || \
-          #           "$(uname -m)" == "aarch64" ]]; then \
-          #       _rust="rust" && \
-          #       export \
-          #         _rust="${_rust}" \
-          #     fi && \
           /entrypoint.sh \
-            apt \
+            pkg \
               install \
                 -y \
-                "rust" \
-                "rust-std-armv7-linux-androideabi"
+                "python-pip"
+          /entrypoint.sh \
+            pip \
+              install \
+                "build"
+          /entrypoint.sh \
+            pip \
+              install \
+                "installer"
+          /entrypoint.sh \
+            pip \
+              install \
+                "setuptools"
+          /entrypoint.sh \
+            pip \
+              install \
+                "flit-core"
+          /entrypoint.sh \
+            pip \
+              install \
+                "cython"
+          /entrypoint.sh \
+            pip \
+              install \
+                "multidict"
+      # - name:
+      #     Installs Rust.
+      #   run: |
+      #     env 
+      #       _arch="$( \
+      #         uname \
+      #           -m)" \
+      #       export \
+      #         _arch="$( \
+      #           uname \
+      #             -m)" && \
+      #       /entrypoint.sh \
+      #         echo \
+      #           "Architecture: ${_arch}" && \
+      #         if [[ "$(uname -m)" == "armv7l" || \
+      #               "$(uname -m)" == "armv8l" ]]; then \
+      #           _rust="rust-std-armv7-linux-androideabi" \
+      #         fi \
+      #         if [[ "${RUNNER_ARCH}" == "X64" ]]; then \
+      #           _rust="rust" && \
+      #           export \
+      #             _rust="${_rust}" \
+      #         fi \
+      #         if [[ "$(uname -m)" == "i686" || \
+      #               "$(uname -m)" == "aarch64" ]]; then \
+      #           _rust="rust" && \
+      #           export \
+      #             _rust="${_rust}" \
+      #         fi && \
+      #     /entrypoint.sh \
+      #       apt \
+      #         install \
+      #           -y \
+      #           "rust" \
+      #           "rust-std-armv7-linux-androideabi"
       - name:
           Installs Git.
         run: |
@@ -188,17 +248,18 @@ jobs:
             pkg \
               install \
                 -y \
+                "gh" \
                 "git" \
                 "jq" \
                 "tree"
-      - name:
-          Installs Capnproto.
-        run: |
-          /entrypoint.sh \
-            pkg \
-              install \
-                -y \
-                "capnproto"
+      # - name:
+      #     Installs Capnproto.
+      #   run: |
+      #     /entrypoint.sh \
+      #       pkg \
+      #         install \
+      #           -y \
+      #           "capnproto"
       - name:
           Installs Pacman.
         run: |
@@ -246,7 +307,8 @@ jobs:
                 --single-branch \
                 --depth=1 \
                 "https://github.com/themartiancompany/fur" \
-                "${HOME}/fur"
+                "${HOME}/fur" || \
+            true
           /entrypoint.sh \
             rm \
               "${HOME}/fur/termux/any/"*".pkg.tar."*".sig"
@@ -260,7 +322,7 @@ jobs:
               -rf \
               "${HOME}/fur"
       - name:
-          Installs latest Fur.
+          Downloads latest Fur.
         run: |
           /entrypoint.sh \
             git \
@@ -269,7 +331,8 @@ jobs:
                 --single-branch \
                 --depth=1 \
                 "https://github.com/themartiancompany/fur" \
-                "${HOME}/fur-src"
+                "${HOME}/fur-src" || \
+            true
       - name:
           Installs Python Pygments.
         run: |
@@ -349,28 +412,6 @@ jobs:
                 "pacman" \
               -d \
               "python-docutils"
-          /entrypoint.sh \
-            rm \
-              "${HOME}/fur/termux/any/"*".pkg.tar."*".sig"
-          /entrypoint.sh \
-            pacman \
-              -Udd \
-              --noconfirm \
-              "${HOME}/fur/termux/any/"*".pkg.tar."*
-          /entrypoint.sh \
-            rm \
-              -rf \
-              "${HOME}/fur"
-      - name:
-          Installs Key Gen.
-        run: |
-          /entrypoint.sh \
-            fur \
-              -v \
-              -p \
-                "pacman" \
-              -d \
-              "key-gen"
           /entrypoint.sh \
             rm \
               "${HOME}/fur/termux/any/"*".pkg.tar."*".sig"
@@ -614,105 +655,328 @@ jobs:
                 -y \
                 "clang" \
                 "ninja"
-          # This doesn't work because 'NO KEYSERVERS AVAILABLE'
+          # This doesn't work
           # /entrypoint.sh \
           #   gpg \
           #     --homedir \
           #       "/data/data/com.termux/files/usr/etc/pacman.d/gnupg" \
           #     --recv-keys \
           #       "998DE27318E867EA976BA877389CEED64573DFCA"
-          # So you know what?
-          /entrypoint.sh \
-            PATH="${PATH}:/data/data/com.termux/files/usr/bin" \
-            evmfs \
-              -o \
-                "pacman@termux.dev.asc" \
-              get \
-                "evmfs://100/0x69470b18f8b8b5f92b48f6199dcb147b4be96571/0x87003Bd6C074C713783df04f36517451fF34CBEf/40058fc10eb613e40f3447707ee0a972b956927b5b34250241c76e1ed62a233c"  
-          /entrypoint.sh \
-            gpg \
-              --homedir \
-                "/data/data/com.termux/files/usr/etc/pacman.d/gnupg" \
-              import \
-                "pacman@termux.dev.asc"
           # One needs to manually install the
           # termux-keyring pacman package if
           # in the Termux Debian environment.
-          /entrypoint.sh \
-            pacman \
-              -Sy \
-              termux-keyring
-          /entrypoint.sh \
-            pacman-key \
-              --init
+          # /entrypoint.sh \
+          #   pacman \
+          #     -Sy \
+          #     termux-keyring
+          # /entrypoint.sh \
+          #   pacman-key \
+          #     --init
           # /entrypoint.sh \
           #   pip \
           #     install \
           #     "meson"
       - name:
-          Installs package build dependencies.
+          Installs Termux Keyring.
         run: |
           /entrypoint.sh \
-            pacman \
-              -S \
-              --noconfirm \
-              $(/entrypoint.sh \
-                  _evmfs="false" \
-                  recipe-get \
-                    "PKGBUILD" \
-                    "makedepends")
-      - name:
-          Builds the package.
-        run: |
-          /entrypoint.sh \
-            _git_service="github" \
-            _evmfs="false" \
-            _git="true" \
-            TERMUX_VERSION=50 \
-            reallymakepkg \
+            fur \
               -v \
-              -w \
-                "${HOME}/fur-git-build" \
-              -u \
-              -- \
-              -df \
-              --nocheck
+              -p \
+                "pacman" \
+              -d \
+              "termux-keyring"
           /entrypoint.sh \
-            echo \
-              "Home: ${HOME}"
-          find \
-            "${PWD}" \
-            -iname \
-              "*.pkg.tar.*"
-      - name:
-          Installs the package.
-        run: |
-          /entrypoint.sh \
-            pacman \
-              -Rdd \
-              --noconfirm \
-              fur || \
-              true
-          /entrypoint.sh \
-            pacman \
-              -Rdd \
-              --noconfirm \
-              fur-docs || \
-              true
+            rm \
+              "${HOME}/fur/termux/any/"*".pkg.tar."*".sig"
           /entrypoint.sh \
             pacman \
               -Udd \
               --noconfirm \
-              $(find \
-                  "${PWD}" \
-                  -iname \
-                    "*.pkg.tar.*")
+              "${HOME}/fur/termux/any/"*".pkg.tar."* \
+              --overwrite="*"
+          /entrypoint.sh \
+            rm \
+              -rf \
+              "${HOME}/fur"
+          /entrypoint.sh \
+            pacman-key \
+              --init || \
+            true
+          /entrypoint.sh \
+            pacman \
+              -Sy || \
+            true
+      - name:
+          Install docutils.
+        run: |
+          /entrypoint.sh \
+            pip \
+              install \
+                "docutils"
+      - name:
+          Read pkgbase.
+        run: |
+          export \
+            _pkgbase="$( \
+              _evmfs="false" \
+              _git_service="github" \
+              /entrypoint.sh \
+                recipe-get \
+                  "PKGBUILD" \
+                  "pkgbase")"
+          export \
+            _pkgname="$( \
+              _evmfs="false" \
+              _git_service="github" \
+              /entrypoint.sh \
+                recipe-get \
+                  "PKGBUILD" \
+                  "pkgname")"
+      - name:
+          Installs latest Reallymakepkg.
+        run: |
+          /entrypoint.sh \
+            pacman \
+              -Rdd \
+              --noconfirm \
+              "reallymakepkg"
+          /entrypoint.sh \
+            git \
+              clone \
+                "https://github.com/themartiancompany/reallymakepkg" \
+                "${HOME}/reallymakepkg-src" || \
+              true
+          /entrypoint.sh \
+            make \
+              PREFIX="/usr" \
+              -C \
+                "${HOME}/reallymakepkg-src" \
+              install-scripts
+          /entrypoint.sh \
+            make \
+              -C \
+                "${HOME}/reallymakepkg-src" \
+              install-scripts
+          /entrypoint.sh \
+            make \
+              -C \
+                "${HOME}/reallymakepkg-src" \
+              install-configs || \
+            true
+          /entrypoint.sh \
+            install \
+              -vDm644 \
+              "${HOME}/reallymakepkg-src/configs/makepkg.android.conf" \
+              "/data/data/com.termux/files/usr/etc/reallymakepkg/makepkg.android.conf"
+      - name:
+          Installs latest EVM GNUPG.
+        run: |
+          /entrypoint.sh \
+            git \
+              clone \
+                --single-branch \
+                --depth=1 \
+                "https://github.com/themartiancompany/evm-gnupg" \
+                "${HOME}/evm-gnupg-src" || \
+            true
+          cd \
+            "${HOME}/evm-gnupg-src"
+          /entrypoint.sh \
+            make \
+              PREFIX="/usr" \
+              install-scripts
+      - name:
+          Installs latest Gur.
+        run: |
+          /entrypoint.sh \
+            pkg \
+              install \
+                -y \
+                "gh"
+          /entrypoint.sh \
+            git \
+              clone \
+                --branch="master" \
+                --single-branch \
+                --depth=1 \
+                "https://github.com/themartiancompany/gur" \
+                "${HOME}/gur-src" || \
+            true
+          cd \
+            "${HOME}/gur-src"
+          /entrypoint.sh \
+            make \
+              PREFIX="/usr" \
+              install-scripts
+      - name:
+          Installs latest Fur.
+        run: |
+          /entrypoint.sh \
+            git \
+              clone \
+                --branch="main" \
+                --single-branch \
+                --depth=1 \
+                "https://github.com/themartiancompany/fur" \
+                "${HOME}/fur-src" || \
+            true
+          cd \
+            "${HOME}/fur-src"
+          /entrypoint.sh \
+            make \
+              PREFIX="/usr" \
+              install-fur
+      - name:
+          Installs build dependencies.
+        run: |
+          _evmfs="false" \
+          _git_service="github" \
+          recipe-get \
+            -o \
+              "array" \
+            -d \
+              " " \
+            "PKGBUILD" \
+            "makedepends" > \
+            "${HOME}/makedepends"
+          for _pkg in $(cat "${HOME}/makedepends"); do \
+            _depend_name="$( \
+              /entrypoint.sh \
+                version-split \
+                  "${_pkg}" \
+                  "name")"
+            SHELL="bash" \
+            /entrypoint.sh \
+              pacman \
+                -S \
+                  --noconfirm \
+                  jq \
+                  "${_depend_name}" \
+                  --overwrite="*" || \
+                true
+          done
+          for _pkg in $(cat "${HOME}/makedepends"); do \
+            _depend_name="$( \
+              /entrypoint.sh \
+                version-split \
+                  "${_pkg}" \
+                  "name")"
+            /entrypoint.sh \
+              fur \
+                -v \
+                -t \
+                  "ci" \
+                -m \
+                  "github" \
+                -p \
+                  "pacman" \
+                "${_pkg}" || \
+              true
+          done
+      - name:
+          Builds the Android package.
+        run: |
+          export \
+            _arch="$( \
+              uname \
+                -m)"
+          export \
+            _pkgbase="$( \
+              /entrypoint.sh \
+                recipe-get \
+                  "PKGBUILD" \
+                  "pkgbase")"
+          _pkgbase="$( \
+            /entrypoint.sh \
+              recipe-get \
+                "PKGBUILD" \
+                "pkgbase")" && \
+          /entrypoint.sh \
+            mkdir \
+              -p \
+              "${HOME}/${_pkgbase}-build" && \
+          _arch="$( \
+            uname \
+              -m)" && \
+          if [[ "${_arch}" == "armv8l" ]]; then \
+            _arch="arm"; \
+          fi && \
+          /entrypoint.sh \
+            arch="${_arch}" \
+            TERMUX_VERSION=50 \
+            _evmfs="false" \
+            _git="false" \
+            _git_service="github" \
+            recipe-get \
+              -v \
+              "PKGBUILD" \
+              "source"
+          /entrypoint.sh \
+            arch="${_arch}" \
+            TERMUX_VERSION=50 \
+            _evmfs="false" \
+            _git="false" \
+            _git_service="github" \
+            recipe-get \
+              -v \
+              "PKGBUILD" \
+              "sha256sums" && \
+          /entrypoint.sh \
+            TERMUX_VERSION=50 \
+            arch="${_arch}" \
+            _evmfs="false" \
+            _git="false" \
+            _git_service="github" \
+            reallymakepkg \
+              -v \
+              -w \
+                "${HOME}/${_pkgbase}-build" \
+              -u \
+              -- \
+              -df \
+              --nocheck \
+              --skippgpcheck
+          /entrypoint.sh \
+            echo \
+              "Home: ${HOME}"
+          echo \
+            "Packages found:"
+          find \
+            "${PWD}" \
+            -iname \
+              "*.pkg.tar.*"
+          bash \
+            ".github/android-arm32-fix"
+      # - name:
+      #     Installs the package.
+      #   run: |
+      #     export \
+      #       _pkgname="$( \
+      #         /entrypoint.sh \
+      #           recipe-get \
+      #             "PKGBUILD" \
+      #             "pkgname")"
+      #     /entrypoint.sh \
+      #       pacman \
+      #         -Rdd \
+      #         --noconfirm \
+      #         ${_pkgname} || \
+      #         true
+      #     /entrypoint.sh \
+      #       pacman \
+      #         -Udd \
+      #         --noconfirm \
+      #         $(find \
+      #             "${PWD}" \
+      #             -iname \
+      #               "*.pkg.tar.*")
       - name:
           version
         run: |
           /entrypoint.sh \
             _evmfs="false" \
-            _git="true" \
+            _git_service="github" \
             makepkg \
               --nobuild \
               -df \
@@ -723,7 +987,12 @@ jobs:
                 _evmfs="false" \
                 recipe-get \
                   "PKGBUILD" \
-                  "pkgver")"
+                  "pkgver")-$( \
+              /entrypoint.sh \
+                _evmfs="false" \
+                recipe-get \
+                  "PKGBUILD" \
+                  "pkgrel")"
         id:
           version
       - name:
@@ -738,9 +1007,9 @@ jobs:
             ${{ github.event.release.upload_url }}
             # ${{ steps.create_release.outputs.upload_url }}
           asset_path:
-            fur-git-${{ steps.version.outputs.version }}-1-any.pkg.tar.xz
+            "solidity0.8.24-${{ steps.version.outputs.version }}-${{ matrix.architecture }}.pkg.tar.xz"
           asset_name:
-            dogeos-android-fur-git-${{ steps.version.outputs.version }}-1-any.pkg.tar.xz
+            "dogeos-android-solidity0.8.24-${{ steps.version.outputs.version }}-${{ matrix.architecture }}.pkg.tar.xz"
           asset_content_type:
             application/gzip
   arch_release:
@@ -816,10 +1085,13 @@ jobs:
           pacman \
             -S \
             --noconfirm \
+            "github-cli" \
             "git" \
             "jq" \
             "python" \
             "python-docutils" \
+            "python-pip" \
+            "python-build" \
             "tree"
       - uses:
           actions/checkout@v4.2.2
@@ -1007,28 +1279,6 @@ jobs:
           rm \
             -rf \
             "${HOME}/fur"
-      - name:
-          Installs Key Gen.
-        run: |
-          /entrypoint.sh \
-            fur \
-              -v \
-              -p \
-                "pacman" \
-              -d \
-              "key-gen"
-          /entrypoint.sh \
-            rm \
-              "${HOME}/fur/termux/any/"*".pkg.tar."*".sig"
-          /entrypoint.sh \
-            pacman \
-              -Udd \
-              --noconfirm \
-              "${HOME}/fur/termux/any/"*".pkg.tar."*
-          /entrypoint.sh \
-            rm \
-              -rf \
-              "${HOME}/fur"
       - name:
           Installs EVM Chains Info.
         run: |
@@ -1241,47 +1491,212 @@ jobs:
             "user:user" \
             "${PWD}"
       - name:
-          Installs build dependencies.
+          Installs latest Reallymakepkg.
+        run: |
+          pacman \
+            -Rdd \
+            --noconfirm \
+            "reallymakepkg"
+          git \
+            clone \
+              --branch="main" \
+              --single-branch \
+              --depth=1 \
+              "https://github.com/themartiancompany/reallymakepkg" \
+              "${HOME}/reallymakepkg-src" || \
+          true
+          git \
+            -C \
+              "${HOME}/reallymakepkg-src" \
+            log | \
+            head \
+              -n \
+                20
+          cd \
+            "${HOME}/reallymakepkg-src"
+          make \
+            -C \
+              "${HOME}/reallymakepkg-src" \
+            PREFIX="/usr" \
+            install-scripts
+          make \
+            -C \
+              "${HOME}/reallymakepkg-src" \
+            PREFIX="/usr" \
+            install-configs || \
+          true
+          install \
+            -vDm644 \
+            "${HOME}/reallymakepkg-src/configs/makepkg.gnu.conf" \
+            "/etc/reallymakepkg/makepkg.gnu.conf"
+      - name:
+          Installs latest EVM GNUPG.
+        run: |
+          git \
+            clone \
+              --single-branch \
+              --depth=1 \
+              "https://github.com/themartiancompany/evm-gnupg" \
+              "${HOME}/evm-gnupg-src" || \
+          true
+          cd \
+            "${HOME}/evm-gnupg-src"
+          make \
+            PREFIX="/usr" \
+            install-scripts
+      - name:
+          Installs latest Gur.
+        run: |
+          git \
+            clone \
+              --branch="master" \
+              --single-branch \
+              --depth=1 \
+              "https://github.com/themartiancompany/gur" \
+              "${HOME}/gur-src" || \
+          true
+          make \
+            -C \
+              "${HOME}/gur-src" \
+            PREFIX="/usr" \
+            install-scripts
+      - name:
+          Installs latest Fur.
+        run: |
+          git \
+            clone \
+              --branch="main" \
+              --single-branch \
+              --depth=1 \
+              "https://github.com/themartiancompany/fur" \
+              "${HOME}/fur-src" || \
+          true
+          cd \
+            "${HOME}/fur-src"
+          make \
+            PREFIX="/usr" \
+            install-fur
+      - name:
+          Read pkgbase.
         run: |
           export \
-            _pkgs=(
-            $(_evmfs="false" \
+            _pkgbase="$( \
               _evmfs="false" \
               recipe-get \
                 "PKGBUILD" \
-                "makedepends")
-          )
-          pacman \
-            -S \
-            --noconfirm \
-            "${_pkgs[@]}"
+                "pkgbase")"
+          export \
+            _pkgname="$( \
+              _evmfs="false" \
+              recipe-get \
+                "PKGBUILD" \
+                "pkgname")"
+      - name:
+          Installs build dependencies.
+        run: |
+          ls
+          _evmfs="false" \
+          _git_service="github" \
+          recipe-get \
+            -o \
+              "array" \
+            -d \
+              " " \
+            "PKGBUILD" \
+            "makedepends" > \
+          "${HOME}/makedepends"
+          # ( _evmfs="false" \
+          #   recipe-get \
+          #     -o \
+          #       "array" \
+          #     -d \
+          #       " " \
+          #     "PKGBUILD" \
+          #     "makedepends" || \
+          #   true ) > \
+          #   "makedepends"
+          export \
+            _makedepends="$( \
+              cat \
+                "${HOME}/makedepends")"
+          echo \
+            "Build dependencies found: '$_makedepends'."
+          for _pkg in "jq" $(cat "${HOME}/makedepends"); do \
+            echo \
+              "Extracting package name from '${_pkg}' with version-split."; \
+            version-split \
+              -v \
+              "${_pkg}" \
+              "name" || \
+              true; \
+            export \
+              _depend_name="$( \
+                version-split \
+                  "${_pkg}" \
+                  "name" || \
+                true)"; \
+            echo \
+              "Installing '${_depend_name}' with pacman."; \
+            pacman \
+              -S \
+                --noconfirm \
+                "${_depend_name}" \
+                --overwrite="*" || \
+              true
+          done
+          for _pkg in $(cat "${HOME}/makedepends"); do \
+            _depend_name="$( \
+              version-split \
+                "${_pkg}" \
+                "name" || \
+              true)"; \
+            echo \
+              "Installing '${_depend_name}' with fur."; \
+              fur \
+                -v \
+                -t \
+                  "ci" \
+                -m \
+                  "github" \
+                -p \
+                  "pacman" \
+                "${_depend_name}" || \
+              true
+          done
       - name:
           Builds the Arch package.
         run: |
+          export \
+            _pkgbase="$( \
+              _evmfs="false" \
+              _git_service="github" \
+              recipe-get \
+                "PKGBUILD" \
+                "pkgbase")"
           su \
             -c \
-              "cd ${PWD} && _evmfs="false" _git_service="github" reallymakepkg -v -u -w '/home/user/fur-git-build' -- -df --nocheck" - \
+              "cd ${PWD} && _evmfs="false" _git_service="github" reallymakepkg -v -u -w '/home/user/${_pkgbase}-build' -- -df --nocheck --skippgpcheck && ls -lsh" - \
             "user"
-      - name:
-          Installs the package.
-        run: |
-          pacman \
-            -Rdd \
-            --noconfirm \
-            fur || \
-            true
-          pacman \
-            -Rdd \
-            --noconfirm \
-            fur-docs || \
-            true
-          pacman \
-            -Udd \
-            --noconfirm \
-            $(find \
-                "${PWD}" \
-                -iname \
-                  "*.pkg.tar.*")
+      # - name:
+      #     Installs the package.
+      #   run: |
+      #     pacman \
+      #       -Rdd \
+      #       --noconfirm \
+      #       fur || \
+      #       true
+      #     pacman \
+      #       -Rdd \
+      #       --noconfirm \
+      #       fur-docs || \
+      #       true
+      #     pacman \
+      #       -Udd \
+      #       --noconfirm \
+      #       $(find \
+      #           "${PWD}" \
+      #           -iname \
+      #             "*.pkg.tar.*")
       - name:
           version
         run: |
@@ -1290,7 +1705,11 @@ jobs:
             _evmfs="false" \
             recipe-get \
               "PKGBUILD" \
-              "pkgver")"
+              "pkgver")-$( \
+            _evmfs="false" \
+            recipe-get \
+              "PKGBUILD" \
+              "pkgrel")"
         id:
           version
       - name:
@@ -1305,9 +1724,9 @@ jobs:
             ${{ github.event.release.upload_url }}
             # ${{ steps.create_release.outputs.upload_url }}
           asset_path:
-            fur-git-${{ steps.version.outputs.version }}-1-any.pkg.tar.xz
+            "solidity0.8.24-${{ steps.version.outputs.version }}-${{ matrix.architecture }}.pkg.tar.xz"
           asset_name:
-            dogeos-gnu-fur-git-${{ steps.version.outputs.version }}-any.pkg.tar.xz
+            "dogeos-gnu-solidity0.8.24-${{ steps.version.outputs.version }}-${{ matrix.architecture }}.pkg.tar.xz"
           asset_content_type:
             application/gzip
   msys2_release:
@@ -1339,9 +1758,11 @@ jobs:
           install:
             base-devel
             dos2unix
+            mingw-w64-${{ matrix.env }}-github-cli
             git
             mingw-w64-${{ matrix.env }}-jq
             mingw-w64-${{ matrix.env }}-gcc
+            mingw-w64-${{ matrix.env }}-nodejs
             python-docutils
       - name:
           Upgrade Arch environment.
@@ -1429,6 +1850,78 @@ jobs:
           rm \
             -rf \
             "${HOME}/fur"
+      - name:
+          Installs latest Crash Bash Library.
+        run: |
+          git \
+            clone \
+              "https://github.com/themartiancompany/crash-bash"
+          cd \
+            "crash-bash"
+          mkdir \
+            -p \
+            "/usr/lib/libcrash-bash"
+          make \
+            PREFIX="/usr" \
+            install
+      - name:
+          Installs latest Reallymakepkg.
+        run: |
+          pacman \
+            -Rdd \
+            --noconfirm \
+            "reallymakepkg"; \
+          git \
+            clone \
+              --branch \
+                "main" \
+              --single-branch \
+              "https://github.com/themartiancompany/reallymakepkg" \
+              "${HOME}/reallymakepkg-src" || \
+          true
+          cd \
+            "${HOME}/reallymakepkg-src"
+          make \
+            -C \
+              "${HOME}/reallymakepkg-src" \
+            PREFIX="/usr" \
+            install-scripts
+          install \
+            -vDm644 \
+            "${HOME}/reallymakepkg-src/configs/makepkg.gnu.conf" \
+            "/etc/reallymakepkg/makepkg.gnu.conf"
+      - name:
+          Installs latest Gur.
+        run: |
+          git \
+            clone \
+              --branch="master" \
+              --single-branch \
+              --depth=1 \
+              "https://github.com/themartiancompany/gur" \
+              "${HOME}/gur-src" || \
+          true
+          make \
+            PREFIX="/usr" \
+            -C \
+              "${HOME}/gur-src" \
+            install-scripts
+      - name:
+          Installs latest Fur.
+        run: |
+          git \
+            clone \
+              --branch="main" \
+              --single-branch \
+              --depth=1 \
+              "https://github.com/themartiancompany/fur" \
+              "${HOME}/fur-src" || \
+          true
+          cd \
+            "${HOME}/fur-src"
+          make \
+            PREFIX="/usr" \
+            install-fur
       # - name:
       #     Installs Rust.
       #   run: |
@@ -1447,68 +1940,219 @@ jobs:
       - uses:
           actions/checkout@v3
       - name:
-          Installs package build dependencies.
+          Installs recent EVM GNUPG.
+        env:
+          GITHUB_TOKEN:
+            ${{ secrets.GITHUB_TOKEN }}
         run: |
           pacman \
             -S \
             --noconfirm \
-            $(_evmfs="false" \
-              recipe-get \
-                "PKGBUILD" \
-                "makedepends")
+            "mingw-w64-${{ matrix.env }}-github-cli"
+          bash \
+            ".github/gur-mini" \
+            "themartiancompany" \
+            "evm-gnupg" \
+            "0.0.0.0.0.0.0.0.1.1.1.1.1.1-15"
+          # git \
+          #   clone \
+          #     --single-branch \
+          #     --depth=1 \
+          #     "https://github.com/themartiancompany/evm-gnupg" \
+          #     "${HOME}/evm-gnupg-src" || \
+          # true
+          # cd \
+          #   "${HOME}/evm-gnupg-src"
+          # make \
+          #   -C \
+          #       "${HOME}/evm-gnupg-src" \
+          #   PREFIX="/usr" \
+          #   install-scripts
+      - name:
+          Installs build dependencies.
+        run: |
+          pacman \
+            -Ss \
+            "npm" || \
+          true
+          dos2unix \
+            "PKGBUILD"
+          _evmfs="false" \
+          _git_service="github" \
+          recipe-get \
+            -v \
+            -o \
+              "array" \
+            -d \
+              " " \
+            "PKGBUILD" \
+            "makedepends" || \
+          true
+          _evmfs="false" \
+          _git_service="github" \
+            "recipe-get" \
+              -o \
+                "array" \
+              -d \
+                " " \
+              "PKGBUILD" \
+              "makedepends" > \
+            "${HOME}/makedepends"; \
+          # ( _evmfs="false" \
+          #   _git_service="github" \
+          #     recipe-get \
+          #       -o \
+          #         "array" \
+          #       -d \
+          #         " " \
+          #       "PKGBUILD" \
+          #       "makedepends" > \
+          #   "${HOME}/makedepends"
+          for _pkg in $(cat "${HOME}/makedepends"); do \
+            _mingw_name="mingw-w64-${{ matrix.env }}-${_pkg}"; \
+            export \
+              _pkgs_mingw="${_pkgs_mingw} ${_mingw_name}"; \
+            echo \
+              "${_mingw_name}" >> \
+              "${HOME}/makedepends-mingw"; \
+          done
+          for _pkg in $(cat "${HOME}/makedepends"); do \
+            _depend_name="$( \
+                version-split \
+                  "${_pkg}" \
+                  "name")"; \
+            echo \
+              "Installing '${_depend_name}' with pacman."; \
+            pacman \
+              -S \
+                --noconfirm \
+                jq \
+                "${_depend_name}" \
+                --overwrite="*" || \
+              true; \
+          done
+          for _pkg in $(cat "${HOME}/makedepends-mingw"); do \
+            _depend_name="$( \
+                version-split \
+                  "${_pkg}" \
+                  "name")"; \
+            echo \
+              "Installing mingw '${_depend_name}' build dependency with pacman."; \
+            pacman \
+              -S \
+                --noconfirm \
+                jq \
+                "${_depend_name}" \
+                --overwrite="*" || \
+              true; \
+          done
+          for _pkg in $(cat "${HOME}/makedepends"); do \
+            _depend_name="$( \
+                version-split \
+                  "${_pkg}" \
+                  "name")"; \
+            echo \
+              "Installing '${_depend_name}' with fur."; \
+              fur \
+                -v \
+                -t \
+                  "ci" \
+                -m \
+                  "github" \
+                -p \
+                  "pacman" \
+                "${_depend_name}" || \
+              true; \
+          done
+          for _pkg in $(cat "${HOME}/makedepends-mingw"); do \
+            _depend_name="$( \
+                version-split \
+                  "${_pkg}" \
+                  "name")"; \
+            echo \
+              "Installing MinGW '${_depend_name}' build dependency with fur."; \
+              fur \
+                -v \
+                -t \
+                  "ci" \
+                -m \
+                  "github" \
+                -p \
+                  "pacman" \
+                "${_depend_name}" || \
+              true; \
+          done
       - name:
           Builds the Windows package.
         run: |
           dos2unix \
             "PKGBUILD"
-          # _evmfs="false" \
-          # PKGEXT='.pkg.tar.xz' \
-          # makepkg \
-          #   -df \
-          #   --nocheck
+          # export \
+          #   _pkgbase="$( \
+          #     recipe-get \
+          #       "PKGBUILD" \
+          #       "pkgbase")"
+          echo \
+            "$(uname \
+                 -o)"
           _evmfs="false" \
           _git_service="github" \
-          reallymakepkg \
+          recipe-get \
             -v \
-            -w \
-              "${HOME}/fur-git-build" \
-            -u \
-            -- \
+            "PKGBUILD" \
+            "source"
+          _evmfs="false" \
+          _git_service="github" \
+          recipe-get \
+            -v \
+            "PKGBUILD" \
+            "sha256sums"
+          PKGEXT='.pkg.tar.xz' \
+          _evmfs="false" \
+          _git="false" \
+          _git_service="github" \
+          makepkg \
             -df \
-            --nocheck
+            --nocheck \
+            --skippgpcheck
+          # _evmfs="false" \
+          # _git_service="github" \
+          # reallymakepkg \
+          #   -v \
+          #   -w \
+          #     "${HOME}/${_pkgbase}-build" \
+          #   -u \
+          #   -- \
+          #   -df \
+          #   --nocheck \
+          #   --skippgpcheck
           find \
             "${PWD}" \
             -iname \
               "*.pkg.tar.*"
-      - name:
-          Installs the package.
-        run: |
-          echo \
-            "env position: $(command -v env)"
-          pacman \
-            -Rdd \
-            --noconfirm \
-            fur || \
-            true
-          pacman \
-            -Rdd \
-            --noconfirm \
-            fur-docs || \
-            true
-          pacman \
-            -Udd \
-            --noconfirm \
-            --overwrite="*" \
-            $(find \
-                "${PWD}" \
-                -iname \
-                  "*.pkg.tar.*")
-      - name:
-          Gets recipe-get.
-        run: |
-          git \
-            clone \
-              "https://github.com/themartiancompany/reallymakepkg"
+      # - name:
+      #     Installs the package.
+      #   run: |
+      #     echo \
+      #       "env position: $(command -v env)"
+      #     pacman \
+      #       -Rdd \
+      #       --noconfirm \
+      #       fur || \
+      #       true
+      #     pacman \
+      #       -Rdd \
+      #       --noconfirm \
+      #       fur-docs || \
+      #       true
+      #     pacman \
+      #       -Udd \
+      #       --noconfirm \
+      #       --overwrite="*" \
+      #       $(find \
+      #           "${PWD}" \
+      #           -iname \
+      #             "*.pkg.tar.*")
       - name:
           version
         run: |
@@ -1516,10 +2160,14 @@ jobs:
             "::set-output name=version::$( \
             export \
               _evmfs="false" && \
-            bash \
-            "reallymakepkg/reallymakepkg/recipe-get" \
+            recipe-get \
               "PKGBUILD" \
-              "pkgver")"
+              "pkgver")-$( \
+            export \
+              _evmfs="false" && \
+            recipe-get \
+              "PKGBUILD" \
+              "pkgrel")"
         id:
           version
       - name:
@@ -1534,9 +2182,9 @@ jobs:
             ${{ github.event.release.upload_url }}
             # ${{ steps.create_release.outputs.upload_url }}
           asset_path:
-            fur-git-${{ steps.version.outputs.version }}-1-any.pkg.tar.xz
+            "solidity0.8.24-${{ steps.version.outputs.version }}-${{ matrix.arch }}.pkg.tar.xz"
           asset_name:
-            dogeos-windows-fur-git-${{ steps.version.outputs.version }}-1-any.pkg.tar.xz
+            "dogeos-windows-solidity0.8.24-${{ steps.version.outputs.version }}-${{ matrix.arch }}.pkg.tar.xz"
           asset_content_type:
             application/gzip
 
@@ -1557,9 +2205,26 @@ jobs:
               -y \
               "ninja" \
               "clang" \
-          pip \
-            install \
-            "meson"
+          /entrypoint.sh \
+            pip \
+              install \
+                "meson"
+          /entrypoint.sh \
+            pip \
+              install \
+                "poetry"
+          /entrypoint.sh \
+            pip \
+              install \
+                "build"
+          /entrypoint.sh \
+            pip \
+              install \
+                "installer"
+          /entrypoint.sh \
+            pip \
+              install \
+                "setuptools"
       - uses:
           actions/checkout@v3.3.0
       - name:
